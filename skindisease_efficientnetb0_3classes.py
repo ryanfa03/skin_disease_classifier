@@ -5,7 +5,11 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
+import matplotlib.pyplot as plt
 import pandas as pd
+import gdown
+from io import BytesIO
+import zipfile
 
 # === Konfigurasi Streamlit ===
 st.set_page_config(page_title="Klasifikasi Penyakit Kulit", layout="centered")
