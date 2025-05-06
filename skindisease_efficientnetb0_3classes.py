@@ -14,7 +14,7 @@ import zipfile
 # === Konfigurasi Streamlit ===
 st.set_page_config(page_title="Klasifikasi Penyakit Kulit", layout="centered")
 st.title("🔬 Klasifikasi Gambar Penyakit Kulit")
-st.write("Unggah gambar kulit dan dapatkan prediksi apakah itu eksim, kurap, atau kondisi lainnya.")
+st.write("Unggah gambar kulit dan dapatkan prediksi apakah itu eksim atau kurap.")
 
 # === Unduh Model dari Google Drive ===
 MODEL_PATH = "best_model_EfficientNetB0_V001.keras"
