@@ -28,7 +28,7 @@ if not os.path.exists(MODEL_PATH):
 model = load_model(MODEL_PATH)
 
 # === Label Kelas === (ubah sesuai urutan saat model dilatih)
-CLASS_NAMES = ['Eksim', 'Kurap', 'Normal']  # Ubah sesuai dengan label sebenarnya
+CLASS_NAMES = ['Eksim', 'Normal', 'Kurap']  # Ubah sesuai dengan label sebenarnya
 
 # === Fungsi Prediksi ===
 def predict(img):
