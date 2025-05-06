@@ -1,0 +1,8 @@
+streamlit>=1.30
+numpy
+tensorflow>=2.9
+Pillow
+matplotlib
+opencv-python
+pandas
+gdown
