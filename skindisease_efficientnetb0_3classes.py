@@ -12,13 +12,42 @@ from io import BytesIO
 import zipfile
 
 # === Konfigurasi halaman ===
-st.set_page_config(page_title="Klasifikasi Penyakit Kulit Eksim dan Kurap", layout="centered")
+st.set_page_config(page_title="🧬 Deteksi Eksim & Kurap", layout="wide")
 
-# === Judul Aplikasi ===
-st.title("🔬 Klasifikasi Gambar Penyakit Kulit")
-st.write("Unggah gambar kulit dan dapatkan prediksi apakah itu eksim atau kurap")
+# === Styling CSS ===
+st.markdown("""
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .main-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+        .subtext {
+            font-size: 16px;
+            color: #6c757d;
+        }
+        .result-box {
+            padding: 1.2rem;
+            border-radius: 12px;
+            background-color: #e9f5ff;
+            border: 1px solid #b6e0fe;
+            margin-top: 1rem;
+        }
+        .prediction-label {
+            font-size: 22px;
+            font-weight: 600;
+            color: #0d6efd;
+        }
+        .confidence-bar .stProgress > div > div {
+            background-color: #0d6efd;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# === Unduh Model dari Google Drive ===
+# === Load Model ===
 MODEL_PATH = "best_model_EfficientNetB0_dense64.keras" 
 GDRIVE_FILE_ID = "124ndd-w4xOdlgSMIob2f5S4Cm2R0rGYG"
 
@@ -26,10 +55,7 @@ if not os.path.exists(MODEL_PATH):
     with st.spinner("📥 Mengunduh model dari Google Drive..."):
         gdown.download(id=GDRIVE_FILE_ID, output=MODEL_PATH, quiet=False)
 
-# === Load Model ===
 model = load_model(MODEL_PATH)
-
-# === Label Kelas ===
 CLASS_NAMES = ['Eksim', 'Normal', 'Kurap']
 
 # === Fungsi Prediksi ===
@@ -37,65 +63,64 @@ def predict(img):
     img = img.resize((224, 224))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
-
     preds = model.predict(img_array)
     class_idx = np.argmax(preds)
     confidence = float(np.max(preds)) * 100
     return CLASS_NAMES[class_idx], confidence, img_array
-
-# === Sidebar Dokumentasi ===
-with st.sidebar:
-    st.title("📄 Dokumentasi")
-    st.markdown("""
-    **Kelas yang dideteksi:**
-    - Eksim
-    - Normal
-    - Kurap
-
-    **Cara pakai:**
-    1. Unggah gambar kulit.
-    2. Klik tombol **Prediksi**.
-    3. Lihat hasil prediksi.
-
-    _Model: EfficientNetB0 (-random forest)_
-    """)
-
-# === Logging prediksi ===
-log_data = []
 
 def log_prediction(filename, label, confidence):
     log_data.append({"filename": filename, "label": label, "confidence": confidence})
     df = pd.DataFrame(log_data)
     df.to_csv('predictions_log.csv', index=False)
 
-# === Upload Gambar Tunggal ===
-uploaded_file = st.file_uploader("Unggah gambar kulit(jpg/jpeg/png)", type=["jpg", "jpeg", "png"])
+log_data = []
 
-if uploaded_file is not None:
-    img = Image.open(uploaded_file).convert("RGB")
-    st.image(img, caption="Gambar kulit yang diunggah", use_container_width=True)
+# === Layout Utama ===
+st.markdown('<div class="main-title">🧬 Aplikasi Deteksi Gambar Penyakit Kulit</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtext">Deteksi cepat antara Eksim, Kurap, atau Kulit Normal</div>', unsafe_allow_html=True)
+st.markdown("---")
 
-    if st.button("🔍 Prediksi"):
-        label, confidence, _ = predict(img)
-        st.success(f"**Hasil Prediksi: {label} ({confidence:.2f}%)**")
+col1, col2 = st.columns(2)
 
-        log_prediction(uploaded_file.name, label, confidence)
+with col1:
+    st.subheader("📤 Unggah Gambar Kulit")
+    uploaded_file = st.file_uploader("Pilih gambar JPG/JPEG/PNG", type=["jpg", "jpeg", "png"])
 
-        # Tampilkan histori
-        st.subheader("📋 Histori Prediksi")
-        if os.path.exists('predictions_log.csv'):
-            log_df = pd.read_csv('predictions_log.csv')
-            st.dataframe(log_df)
+    if uploaded_file is not None:
+        img = Image.open(uploaded_file).convert("RGB")
+        st.image(img, caption="Pratinjau Gambar", use_container_width=True)
 
-# === Batch Prediksi (ZIP) ===
-st.subheader("📂 Batch Prediksi (ZIP)")
-batch_file = st.file_uploader("Unggah file ZIP yang berisi gambar kulit", type=["zip"])
+        if st.button("🔍 Prediksi Sekarang"):
+            label, confidence, _ = predict(img)
+            log_prediction(uploaded_file.name, label, confidence)
 
-if batch_file is not None:
-    with zipfile.ZipFile(BytesIO(batch_file.read())) as archive:
-        image_files = [f for f in archive.namelist() if f.endswith(('jpg', 'jpeg', 'png'))]
-        for image_file in image_files:
-            with archive.open(image_file) as img_file:
-                img = Image.open(img_file).convert("RGB")
-                label, confidence, _ = predict(img)
-                st.write(f"{image_file}: {label} ({confidence:.2f}%)")
+            with col2:
+                st.markdown('<div class="result-box">', unsafe_allow_html=True)
+                st.markdown(f'<div class="prediction-label">✅ {label}</div>', unsafe_allow_html=True)
+                st.progress(confidence / 100)
+                st.markdown(f"**Tingkat Keyakinan:** {confidence:.2f}%")
+                st.markdown('</div>', unsafe_allow_html=True)
+
+                st.subheader("📋 Riwayat Prediksi")
+                if os.path.exists('predictions_log.csv'):
+                    df = pd.read_csv('predictions_log.csv')
+                    st.dataframe(df)
+
+with st.expander("📦 Prediksi Batch (ZIP)", expanded=False):
+    st.write("Unggah file ZIP berisi kumpulan gambar untuk diprediksi sekaligus.")
+    batch_file = st.file_uploader("Unggah ZIP", type=["zip"])
+
+    if batch_file is not None:
+        with zipfile.ZipFile(BytesIO(batch_file.read())) as archive:
+            image_files = [f for f in archive.namelist() if f.endswith(('jpg', 'jpeg', 'png'))]
+            st.write(f"📁 Ditemukan {len(image_files)} gambar dalam ZIP.")
+            results = []
+            for image_file in image_files:
+                with archive.open(image_file) as img_file:
+                    img = Image.open(img_file).convert("RGB")
+                    label, confidence, _ = predict(img)
+                    results.append((image_file, label, confidence))
+
+            st.write("📊 Hasil Batch Prediksi:")
+            for fname, label, conf in results:
+                st.markdown(f"- **{fname}** → {label} ({conf:.2f}%)")
