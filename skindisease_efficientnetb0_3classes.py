@@ -11,13 +11,15 @@ import gdown
 from io import BytesIO
 import zipfile
 
-# === Konfigurasi Streamlit ===
-st.set_page_config(page_title="Klasifikasi Penyakit Kulit", layout="centered")
-st.title("🔬 Klasifikasi Gambar Penyakit Kulit")
-st.write("Unggah gambar kulit dan dapatkan prediksi apakah itu eksim atau kurap.")
+# === Konfigurasi halaman ===
+st.set_page_config(page_title="Klasifikasi X-ray Paru-paru", layout="centered")
+
+# === Judul Aplikasi ===
+st.title("🩻 ALICE: Automated Lung Image Classification and Evaluation ")
+st.write("Klasifikasi Penyakit Paru-paru dari Citra X-Ray")
 
 # === Unduh Model dari Google Drive ===
-MODEL_PATH = "best_model_EfficientNetB0_dense64.keras"
+MODEL_PATH = "best_model_EfficientNetB0_dense64.keras" 
 GDRIVE_FILE_ID = "124ndd-w4xOdlgSMIob2f5S4Cm2R0rGYG"
 
 if not os.path.exists(MODEL_PATH):
@@ -27,8 +29,8 @@ if not os.path.exists(MODEL_PATH):
 # === Load Model ===
 model = load_model(MODEL_PATH)
 
-# === Label Kelas === (ubah sesuai urutan saat model dilatih)
-CLASS_NAMES = ['Eksim', 'Normal', 'Kurap']  # Ubah sesuai dengan label sebenarnya
+# === Label Kelas ===
+CLASS_NAMES = ['Eksim', 'Normal', 'Kurap']
 
 # === Fungsi Prediksi ===
 def predict(img):
@@ -46,16 +48,17 @@ with st.sidebar:
     st.title("📄 Dokumentasi")
     st.markdown("""
     **Kelas yang dideteksi:**
-    - Eksim
-    - Kurap
+    - Corona Virus Disease
     - Normal
+    - Pneumonia
+    - Tuberculosis
 
-    **Cara penggunaan:**
-    1. Unggah gambar kulit.
+    **Cara pakai:**
+    1. Unggah gambar X-ray.
     2. Klik tombol **Prediksi**.
-    3. Lihat hasil prediksi dan tingkat kepercayaannya.
+    3. Lihat hasil prediksi.
 
-    _Model: EfficientNetB0_
+    _Model: EffNetB3_CLAHE (EfficientNetB3 + CLAHE)_
     """)
 
 # === Logging prediksi ===
@@ -84,25 +87,16 @@ if uploaded_file is not None:
         if os.path.exists('predictions_log.csv'):
             log_df = pd.read_csv('predictions_log.csv')
             st.dataframe(log_df)
-            
-# === Batch prediksi ZIP ===
+
+# === Batch Prediksi (ZIP) ===
 st.subheader("📂 Batch Prediksi (ZIP)")
-batch_file = st.file_uploader("Unggah file ZIP berisi gambar kulit", type=["zip"])
+batch_file = st.file_uploader("Unggah file ZIP yang berisi gambar X-ray", type=["zip"])
 
 if batch_file is not None:
-    import zipfile
-    from io import BytesIO
-    
     with zipfile.ZipFile(BytesIO(batch_file.read())) as archive:
         image_files = [f for f in archive.namelist() if f.endswith(('jpg', 'jpeg', 'png'))]
         for image_file in image_files:
             with archive.open(image_file) as img_file:
                 img = Image.open(img_file).convert("RGB")
-                label, confidence = predict(img)
+                label, confidence, _ = predict(img)
                 st.write(f"{image_file}: {label} ({confidence:.2f}%)")
-
-
-
-
-
-
