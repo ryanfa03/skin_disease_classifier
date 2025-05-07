@@ -32,15 +32,14 @@ CLASS_NAMES = ['Eksim', 'Normal', 'Kurap']  # Ubah sesuai dengan label sebenarny
 
 # === Fungsi Prediksi ===
 def predict(img):
-    img = img.resize((224, 224))  # ukuran input untuk EfficientNetB0
+    img = img.resize((224, 224))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array / 255.0  # normalisasi
 
     preds = model.predict(img_array)
     class_idx = np.argmax(preds)
     confidence = float(np.max(preds)) * 100
-    return CLASS_NAMES[class_idx], confidence
+    return CLASS_NAMES[class_idx], confidence, img_array
 
 # === Sidebar Dokumentasi ===
 with st.sidebar:
@@ -67,23 +66,25 @@ def log_prediction(filename, label, confidence):
     df = pd.DataFrame(log_data)
     df.to_csv('predictions_log.csv', index=False)
 
-# === Upload Gambar ===
+# === Upload Gambar Tunggal ===
 uploaded_file = st.file_uploader("Unggah gambar (jpg/jpeg/png)", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     img = Image.open(uploaded_file).convert("RGB")
-    st.image(img, caption="Gambar yang diunggah", use_column_width=True)
+    st.image(img, caption="Gambar X-ray yang diunggah", use_container_width=True)
 
     if st.button("🔍 Prediksi"):
-        label, confidence = predict(img)
+        label, confidence, _ = predict(img)
         st.success(f"**Hasil Prediksi: {label} ({confidence:.2f}%)**")
+
         log_prediction(uploaded_file.name, label, confidence)
 
+        # Tampilkan histori
         st.subheader("📋 Histori Prediksi")
         if os.path.exists('predictions_log.csv'):
             log_df = pd.read_csv('predictions_log.csv')
             st.dataframe(log_df)
-
+            
 # === Batch prediksi ZIP ===
 st.subheader("📂 Batch Prediksi (ZIP)")
 batch_file = st.file_uploader("Unggah file ZIP berisi gambar kulit", type=["zip"])
