@@ -17,8 +17,8 @@ st.title("🔬 Klasifikasi Gambar Penyakit Kulit")
 st.write("Unggah gambar kulit dan dapatkan prediksi apakah itu eksim atau kurap.")
 
 # === Unduh Model dari Google Drive ===
-MODEL_PATH = "best_model_EfficientNetB0_V001.keras"
-GDRIVE_FILE_ID = "1CGx0GKDY0YCodg2iZxz5rflrqTogME5r"
+MODEL_PATH = "best_model_EfficientNetB0_dense64.keras"
+GDRIVE_FILE_ID = "124ndd-w4xOdlgSMIob2f5S4Cm2R0rGYG"
 
 if not os.path.exists(MODEL_PATH):
     with st.spinner("📥 Mengunduh model dari Google Drive..."):
