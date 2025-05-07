@@ -12,11 +12,11 @@ from io import BytesIO
 import zipfile
 
 # === Konfigurasi halaman ===
-st.set_page_config(page_title="Klasifikasi X-ray Paru-paru", layout="centered")
+st.set_page_config(page_title="Klasifikasi Penyakit Kulit Eksim dan Kurap", layout="centered")
 
 # === Judul Aplikasi ===
-st.title("🩻 ALICE: Automated Lung Image Classification and Evaluation ")
-st.write("Klasifikasi Penyakit Paru-paru dari Citra X-Ray")
+st.title("🔬 Klasifikasi Gambar Penyakit Kulit")
+st.write("Unggah gambar kulit dan dapatkan prediksi apakah itu eksim atau kurap")
 
 # === Unduh Model dari Google Drive ===
 MODEL_PATH = "best_model_EfficientNetB0_dense64.keras" 
@@ -48,17 +48,16 @@ with st.sidebar:
     st.title("📄 Dokumentasi")
     st.markdown("""
     **Kelas yang dideteksi:**
-    - Corona Virus Disease
+    - Eksim
     - Normal
-    - Pneumonia
-    - Tuberculosis
+    - Kurap
 
     **Cara pakai:**
-    1. Unggah gambar X-ray.
+    1. Unggah gambar kulit.
     2. Klik tombol **Prediksi**.
     3. Lihat hasil prediksi.
 
-    _Model: EffNetB3_CLAHE (EfficientNetB3 + CLAHE)_
+    _Model: EfficientNetB0 (-random forest)_
     """)
 
 # === Logging prediksi ===
@@ -70,11 +69,11 @@ def log_prediction(filename, label, confidence):
     df.to_csv('predictions_log.csv', index=False)
 
 # === Upload Gambar Tunggal ===
-uploaded_file = st.file_uploader("Unggah gambar (jpg/jpeg/png)", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Unggah gambar kulit(jpg/jpeg/png)", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     img = Image.open(uploaded_file).convert("RGB")
-    st.image(img, caption="Gambar X-ray yang diunggah", use_container_width=True)
+    st.image(img, caption="Gambar kulit yang diunggah", use_container_width=True)
 
     if st.button("🔍 Prediksi"):
         label, confidence, _ = predict(img)
@@ -90,7 +89,7 @@ if uploaded_file is not None:
 
 # === Batch Prediksi (ZIP) ===
 st.subheader("📂 Batch Prediksi (ZIP)")
-batch_file = st.file_uploader("Unggah file ZIP yang berisi gambar X-ray", type=["zip"])
+batch_file = st.file_uploader("Unggah file ZIP yang berisi gambar kulit", type=["zip"])
 
 if batch_file is not None:
     with zipfile.ZipFile(BytesIO(batch_file.read())) as archive:
