@@ -48,15 +48,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # === Load Model ===
-MODEL_PATH = "best_model_EfficientNetB0_dense64.keras" 
-GDRIVE_FILE_ID = "124ndd-w4xOdlgSMIob2f5S4Cm2R0rGYG"
+MODEL_PATH = "best_model_EfficientNetB3_fix.keras" 
+GDRIVE_FILE_ID = "1RVDjKU_JqjM_Gc1iAUSpK61bou71JBFz"
 
 if not os.path.exists(MODEL_PATH):
     with st.spinner("📥 Mengunduh model dari Google Drive..."):
         gdown.download(id=GDRIVE_FILE_ID, output=MODEL_PATH, quiet=False)
 
 model = load_model(MODEL_PATH)
-CLASS_NAMES = ['Eksim', 'Normal', 'Kurap']
+CLASS_NAMES = ['Acne and Rosacea', 'Actinic Keratosis Basal Cell Carcinoma', 'Eczema', 'Exanthems and Drug Eruptions', 'Hair Loss Alopecia', 'Melanoma Skin Cancer Nevi', 'Nail Fungus and other Nail Disease', 'Psoriasis Lichen Planus', 'Seborrheic Keratoses Tumors', 'Urticaria Hives', 'Vascular Tumors', 'Vasculitis', 'Warts Molluscum Viral Infections']
 
 # === Fungsi Prediksi ===
 def predict(img):
@@ -77,7 +77,11 @@ log_data = []
 
 # === Layout Utama ===
 st.markdown('<div class="main-title">🧬 Aplikasi Deteksi Gambar Penyakit Kulit</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtext">Deteksi cepat antara Eksim, Kurap, atau Kulit Normal</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtext">
+            Model ini dirancang untuk melakukan klasifikasi otomatis terhadap 13 kategori penyakit kulit, yaitu: **Acne and Rosacea**, 
+            **Actinic Keratosis Basal Cell Carcinoma**, **Eczema**, **Exanthems and Drug Eruptions**, **Hair Loss Alopecia**, **Melanoma Cancer Skin Nevi**, 
+            **Nail Fungus and Other Nail Diseases**, **Psoriasis Lichen Planus**, **Seborrheic Keratoses Tumors**, **Urticaria Hives**, 
+            **Vascular Tumors**, **Vasculitis**, serta **Warts Molluscum Viral Infections**.</div>', unsafe_allow_html=True)
 st.markdown("---")
 
 col1, col2 = st.columns(2)
