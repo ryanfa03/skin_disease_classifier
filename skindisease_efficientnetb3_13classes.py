@@ -77,11 +77,7 @@ log_data = []
 
 # === Layout Utama ===
 st.markdown('<div class="main-title">🧬 Aplikasi Deteksi Gambar Penyakit Kulit</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtext">
-            Model ini dirancang untuk melakukan klasifikasi otomatis terhadap 13 kategori penyakit kulit, yaitu: **Acne and Rosacea**, 
-            **Actinic Keratosis Basal Cell Carcinoma**, **Eczema**, **Exanthems and Drug Eruptions**, **Hair Loss Alopecia**, **Melanoma Cancer Skin Nevi**, 
-            **Nail Fungus and Other Nail Diseases**, **Psoriasis Lichen Planus**, **Seborrheic Keratoses Tumors**, **Urticaria Hives**, 
-            **Vascular Tumors**, **Vasculitis**, serta **Warts Molluscum Viral Infections**.</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtext"> Model ini dirancang untuk melakukan klasifikasi otomatis terhadap 13 kategori penyakit kulit, yaitu: **Acne and Rosacea**, **Actinic Keratosis Basal Cell Carcinoma**, **Eczema**, **Exanthems and Drug Eruptions**, **Hair Loss Alopecia**, **Melanoma Cancer Skin Nevi**, **Nail Fungus and Other Nail Diseases**, **Psoriasis Lichen Planus**, **Seborrheic Keratoses Tumors**, **Urticaria Hives**, **Vascular Tumors**, **Vasculitis**, serta **Warts Molluscum Viral Infections**.</div>', unsafe_allow_html=True)
 st.markdown("---")
 
 col1, col2 = st.columns(2)
