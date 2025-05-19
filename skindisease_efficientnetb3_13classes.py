@@ -49,7 +49,7 @@ st.markdown("""
 
 # === Load Model ===
 MODEL_PATH = "best_model_EfficientNetB3_fix.keras" 
-GDRIVE_FILE_ID = "1RVDjKU_JqjM_Gc1iAUSpK61bou71JBFz"
+GDRIVE_FILE_ID = "1A2G5fpbw4Xmlvogqj1mYem9hacxeSJoX"
 
 if not os.path.exists(MODEL_PATH):
     with st.spinner("📥 Mengunduh model dari Google Drive..."):
