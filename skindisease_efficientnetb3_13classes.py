@@ -60,7 +60,7 @@ CLASS_NAMES = ['Acne and Rosacea', 'Actinic Keratosis Basal Cell Carcinoma', 'Ec
 
 # === Fungsi Prediksi ===
 def predict(img):
-    img = img.resize((224, 224))
+    img = img.resize((300, 300))
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
     preds = model.predict(img_array)
