@@ -3,7 +3,6 @@ import numpy as np
 import os
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
 from PIL import Image
 import pandas as pd
 import gdown
@@ -46,11 +45,14 @@ GDRIVE_FILE_ID = "1A2G5fpbw4Xmlvogqj1mYem9hacxeSJoX"
 
 @st.cache_resource
 def load_skin_model():
-    if not os.path.exists(MODEL_PATH):
-        with st.spinner("📥 Mengunduh model dari Google Drive..."):
-            gdown.download(id=GDRIVE_FILE_ID, output=MODEL_PATH, quiet=False)
-    model = load_model(MODEL_PATH)
-    return model
+    try:
+        if not os.path.exists(MODEL_PATH):
+            with st.spinner("📥 Mengunduh model dari Google Drive..."):
+                gdown.download(id=GDRIVE_FILE_ID, output=MODEL_PATH, quiet=False)
+        return load_model(MODEL_PATH)
+    except Exception as e:
+        st.error(f"❌ Gagal memuat model: {e}")
+        return None
 
 model = load_skin_model()
 
@@ -63,9 +65,9 @@ CLASS_NAMES = [
 ]
 
 # === Fungsi Prediksi ===
-def predict(img):
+def predict(img: Image.Image):
     img = img.resize((300, 300))
-    img_array = image.img_to_array(img)
+    img_array = np.array(img) / 255.0  # normalisasi
     img_array = np.expand_dims(img_array, axis=0)
     preds = model.predict(img_array, verbose=0)
     class_idx = np.argmax(preds)
@@ -102,12 +104,13 @@ with col1:
 
         if st.button("🔍 Prediksi Sekarang"):
             label, confidence = predict(img)
-            log_prediction(uploaded_file.name, label, confidence)
+            filename = uploaded_file.name if hasattr(uploaded_file, "name") else "unknown.jpg"
+            log_prediction(filename, label, confidence)
 
             # Tampilkan hasil di col2
             with col2:
                 st.markdown('<div class="result-box">', unsafe_allow_html=True)
-                st.markdown(f'<div class="prediction-label">✅ {label}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="prediction-label">✅ Prediksi: {label}</div>', unsafe_allow_html=True)
                 st.progress(confidence / 100)
                 st.markdown(f"**Tingkat Keyakinan:** {confidence:.2f}%")
                 st.markdown('</div>', unsafe_allow_html=True)
@@ -126,19 +129,23 @@ with st.expander("📦 Prediksi Batch (ZIP)", expanded=False):
     if batch_file:
         with zipfile.ZipFile(BytesIO(batch_file.read())) as archive:
             image_files = [f for f in archive.namelist() if f.lower().endswith(('jpg', 'jpeg', 'png'))]
-            st.success(f"📁 Ditemukan {len(image_files)} gambar dalam ZIP.")
-            results = []
 
-            for image_file in image_files:
-                with archive.open(image_file) as img_file:
-                    try:
-                        img = Image.open(img_file).convert("RGB")
-                        label, confidence = predict(img)
-                        results.append({"filename": image_file, "label": label, "confidence": confidence})
-                        log_prediction(image_file, label, confidence)
-                    except Exception as e:
-                        st.error(f"Gagal memproses {image_file}: {e}")
+            if not image_files:
+                st.warning("❗ ZIP tidak berisi file gambar yang valid.")
+            else:
+                st.success(f"📁 Ditemukan {len(image_files)} gambar dalam ZIP.")
+                results = []
 
-            if results:
-                st.write("📊 Hasil Prediksi Batch:")
-                st.dataframe(pd.DataFrame(results))
+                for image_file in image_files:
+                    with archive.open(image_file) as img_file:
+                        try:
+                            img = Image.open(img_file).convert("RGB")
+                            label, confidence = predict(img)
+                            results.append({"filename": image_file, "label": label, "confidence": confidence})
+                            log_prediction(image_file, label, confidence)
+                        except Exception as e:
+                            st.error(f"❌ Gagal memproses {image_file}: {e}")
+
+                if results:
+                    st.write("📊 Hasil Prediksi Batch:")
+                    st.dataframe(pd.DataFrame(results))
