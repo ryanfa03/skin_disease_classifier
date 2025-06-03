@@ -56,13 +56,11 @@ def load_skin_model():
 
 model = load_skin_model()
 
-CLASS_NAMES = [
-    'Acne and Rosacea', 'Actinic Keratosis Basal Cell Carcinoma', 'Eczema',
-    'Exanthems and Drug Eruptions', 'Hair Loss Alopecia', 'Melanoma Skin Cancer Nevi',
-    'Nail Fungus and other Nail Disease', 'Psoriasis Lichen Planus',
-    'Seborrheic Keratoses Tumors', 'Urticaria Hives', 'Vascular Tumors',
-    'Vasculitis', 'Warts Molluscum Viral Infections'
-]
+CLASS_NAMES = ['Acne and Rosacea', 'Actinic Keratosis Basal Cell Carcinoma', 'Eczema', 
+               'Exanthems and Drug Eruptions', 'Hair Loss Alopecia', 
+               'Melanoma Skin Cancer Nevi', 'Nail Fungus and other Nail Disease', 
+               'Psoriasis Lichen Planus', 'Seborrheic Keratoses Tumors', 'Urticaria Hives', 
+               'Vascular Tumors', 'Vasculitis', 'Warts Molluscum Viral Infections']
 
 # === Fungsi Prediksi ===
 def predict(img: Image.Image):
