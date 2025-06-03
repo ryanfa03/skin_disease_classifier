@@ -63,15 +63,22 @@ CLASS_NAMES = ['Acne and Rosacea', 'Actinic Keratosis Basal Cell Carcinoma', 'Ec
                'Vascular Tumors', 'Vasculitis', 'Warts Molluscum Viral Infections']
 
 # === Fungsi Prediksi ===
+from tensorflow.keras.applications.efficientnet import preprocess_input
+
 def predict(img: Image.Image):
-    img = img.resize((300, 300))
-    img_array = np.array(img) / 255.0  # normalisasi
+    if model is None:
+        st.error("❌ Model tidak tersedia. Pastikan file model berhasil dimuat.")
+        return "Model Error", 0.0
+
+    img = img.resize((300, 300))  # Pastikan sesuai model
+    img_array = np.array(img)
+    img_array = preprocess_input(img_array)  # Gunakan preprocessing bawaan model
     img_array = np.expand_dims(img_array, axis=0)
     preds = model.predict(img_array, verbose=0)
+    st.write("Softmax Output:", preds)  # Debug (opsional)
     class_idx = np.argmax(preds)
     confidence = float(np.max(preds)) * 100
     return CLASS_NAMES[class_idx], confidence
-
 # === Fungsi Log Prediksi ===
 LOG_PATH = "predictions_log.csv"
 
