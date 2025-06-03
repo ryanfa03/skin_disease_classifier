@@ -12,7 +12,7 @@ from io import BytesIO
 import zipfile
 
 # === Konfigurasi halaman ===
-st.set_page_config(page_title="🧬 Deteksi Eksim & Kurap", layout="wide")
+st.set_page_config(page_title="🧬 Deteksi Penyakit Kulit", layout="wide")
 
 # === Styling CSS ===
 st.markdown("""
