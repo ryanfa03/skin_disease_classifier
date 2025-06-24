@@ -56,7 +56,11 @@ if not os.path.exists(MODEL_PATH):
         gdown.download(id=GDRIVE_FILE_ID, output=MODEL_PATH, quiet=False)
 
 model = load_model(MODEL_PATH)
-CLASS_NAMES = ['Acne and Rosacea', 'Actinic Keratosis Basal Cell Carcinoma', 'Eczema', 'Exanthems and Drug Eruptions', 'Hair Loss Alopecia', 'Melanoma Skin Cancer Nevi', 'Nail Fungus and other Nail Disease', 'Psoriasis Lichen Planus', 'Seborrheic Keratoses Tumors', 'Urticaria Hives', 'Vascular Tumors', 'Vasculitis', 'Warts Molluscum Viral Infections']
+CLASS_NAMES = ['Acne and Rosacea', 'Actinic Keratosis Basal Cell Carcinoma', 'Eczema',
+               'Exanthems and Drug Eruptions', 'Hair Loss Alopecia', 'Melanoma Skin Cancer Nevi',
+               'Nail Fungus and other Nail Disease', 'Psoriasis Lichen Planus',
+               'Seborrheic Keratoses Tumors', 'Urticaria Hives', 'Vascular Tumors',
+               'Vasculitis', 'Warts Molluscum Viral Infections']
 
 # === Fungsi Prediksi ===
 def predict(img):
@@ -106,6 +110,7 @@ with col1:
                     df = pd.read_csv('predictions_log.csv')
                     st.dataframe(df)
 
+# === Prediksi Batch ===
 with st.expander("📦 Prediksi Batch (ZIP)", expanded=False):
     st.write("Unggah file ZIP berisi kumpulan gambar untuk diprediksi sekaligus.")
     batch_file = st.file_uploader("Unggah ZIP", type=["zip"])
@@ -115,7 +120,6 @@ with st.expander("📦 Prediksi Batch (ZIP)", expanded=False):
             image_files = [f for f in archive.namelist() if f.endswith(('jpg', 'jpeg', 'png'))]
             st.write(f"📁 Ditemukan {len(image_files)} gambar dalam ZIP.")
             
-            # Simpan hasil prediksi batch dalam DataFrame
             batch_results = []
 
             for image_file in image_files:
@@ -128,12 +132,11 @@ with st.expander("📦 Prediksi Batch (ZIP)", expanded=False):
                         "Confidence (%)": f"{confidence:.2f}"
                     })
 
-            # Tampilkan sebagai tabel
             df_batch = pd.DataFrame(batch_results)
             st.subheader("📊 Tabel Hasil Batch Prediksi")
             st.dataframe(df_batch, use_container_width=True)
 
-            # Simpan sebagai CSV opsional (jika dibutuhkan)
+            # Opsional: Unduh hasil batch prediksi sebagai CSV
             csv = df_batch.to_csv(index=False).encode('utf-8')
             st.download_button(
                 label="⬇️ Unduh Hasil Batch (.csv)",
