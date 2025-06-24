@@ -2,44 +2,7 @@ import streamlit as st
 import numpy as np
 import os
 import tensorflow as tf
-from tensorflow.keras.models import load_model# Bagian dalam with st.expander(...) sebelumnya
-
-with st.expander("📦 Prediksi Batch (ZIP)", expanded=False):
-    st.write("Unggah file ZIP berisi kumpulan gambar untuk diprediksi sekaligus.")
-    batch_file = st.file_uploader("Unggah ZIP", type=["zip"])
-
-    if batch_file is not None:
-        with zipfile.ZipFile(BytesIO(batch_file.read())) as archive:
-            image_files = [f for f in archive.namelist() if f.endswith(('jpg', 'jpeg', 'png'))]
-            st.write(f"📁 Ditemukan {len(image_files)} gambar dalam ZIP.")
-            
-            # Simpan hasil prediksi batch dalam DataFrame
-            batch_results = []
-
-            for image_file in image_files:
-                with archive.open(image_file) as img_file:
-                    img = Image.open(img_file).convert("RGB")
-                    label, confidence, _ = predict(img)
-                    batch_results.append({
-                        "Nama File": image_file,
-                        "Kelas Prediksi": label,
-                        "Confidence (%)": f"{confidence:.2f}"
-                    })
-
-            # Tampilkan sebagai tabel
-            df_batch = pd.DataFrame(batch_results)
-            st.subheader("📊 Tabel Hasil Batch Prediksi")
-            st.dataframe(df_batch, use_container_width=True)
-
-            # Simpan sebagai CSV opsional (jika dibutuhkan)
-            csv = df_batch.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="⬇️ Unduh Hasil Batch (.csv)",
-                data=csv,
-                file_name='hasil_batch_prediksi.csv',
-                mime='text/csv'
-            )
-
+from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import matplotlib.pyplot as plt
