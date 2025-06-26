@@ -1,1 +1,1 @@
-# skin_disease_clssfifier
+# skin_disease_classfifier
